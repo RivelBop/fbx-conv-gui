@@ -15,9 +15,17 @@ import java.io.IOException;
 
 import static com.rivelbop.fbxconvgui.FbxConvGui.*;
 
+/**
+ * Creates a file explorer window using Java Swing.
+ *
+ * @author David Jerzak (RivelBop)
+ */
 public class FileExplorerWindow extends JFrame {
     public JFileChooser explorer;
 
+    /**
+     * Creates and configures a BorderLayout JFrame, adds a centered JFileChooser to it.
+     */
     public FileExplorerWindow() {
         super("Select FBX File");
 
@@ -29,14 +37,18 @@ public class FileExplorerWindow extends JFrame {
         createWindow();
     }
 
+    /**
+     * Creates and filters the JFileChooser.
+     */
     private void createFileExplorer() {
+        // Filter FBX files only
         explorer = new JFileChooser();
-        explorer.setFileSelectionMode(JFileChooser.FILES_ONLY);
         explorer.setAcceptAllFileFilterUsed(false);
+        explorer.setFileSelectionMode(JFileChooser.FILES_ONLY);
         explorer.setFileFilter(new FileFilter() {
             @Override
             public boolean accept(File f) {
-                return f.getName().toLowerCase().endsWith(".fbx");
+                return f.isDirectory() || f.getName().toLowerCase().endsWith(".fbx");
             }
 
             @Override
@@ -44,8 +56,11 @@ public class FileExplorerWindow extends JFrame {
                 return ".fbx (3D Model Format)";
             }
         });
+
+        // If FBX file is selected, convert the model, and display it to the user
         explorer.addActionListener(e -> {
             if (e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION)) {
+                // Converts the selected FBX file to both G3DB and G3DJ
                 File fbxFile = explorer.getSelectedFile();
                 try {
                     FbxConv.convertModel(fbxFile.getAbsolutePath());
@@ -54,6 +69,7 @@ public class FileExplorerWindow extends JFrame {
                 }
                 setVisible(false);
 
+                // Sets the in-app model to the generated G3DB model
                 Gdx.app.postRunnable(() -> {
                     model = new G3dModelLoader(new UBJsonReader())
                             .loadModel(
@@ -64,26 +80,28 @@ public class FileExplorerWindow extends JFrame {
                     animationController.setAnimation(
                             new JsonReader()
                                     .parse(Gdx.files.absolute(fbxFile.getAbsolutePath().replace(".fbx", ".g3dj")))
-                                    .get("animations").child.get("id").asString()
+                                    .get("animations").child.get("id").asString(), -1
                     );
                 });
-            } else if (e.getActionCommand().equals(JFileChooser.CANCEL_SELECTION)) {
-                setVisible(false);
-            }
+            } else if (e.getActionCommand().equals(JFileChooser.CANCEL_SELECTION)) setVisible(false);
         });
     }
 
+    /**
+     * Creates a JFrame that is hidden on close, 350-650 size, and always on top.
+     */
     private void createWindow() {
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 
-        setMinimumSize(new Dimension(250, 250));
-        setMaximumSize(new Dimension(650, 650));
+        setMinimumSize(new Dimension(350, 350));
         setPreferredSize(new Dimension(450, 450));
+        setMaximumSize(new Dimension(650, 650));
         setSize(450, 450);
 
         setLocationRelativeTo(null);
 
         pack();
         setVisible(true);
+        setAlwaysOnTop(true);
     }
 }

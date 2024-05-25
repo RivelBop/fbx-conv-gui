@@ -11,7 +11,7 @@ public class DesktopLauncher {
 	public final static int MAX_HEIGHT = 1080, MAX_WIDTH = MAX_HEIGHT * 16 / 9;
 	public final static int MIN_HEIGHT = 480, MIN_WIDTH = MIN_HEIGHT * 16 / 9;
 
-	public static void main (String[] arg) {
+	public static void main (String[] args) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.useVsync(true);
 		config.setResizable(true);

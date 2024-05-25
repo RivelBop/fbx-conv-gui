@@ -32,27 +32,6 @@ import java.util.ArrayList;
  * @author Danilo Costa Viana
  */
 public class G3DBConverter {
-
-    /**
-     * Batch convert all files with the {@code g3dj} extension inside a folder to the G3DB format (Binary JSON).
-     *
-     * @param args First argument is the folder and it needs to be an absolute path. Optionaly the second argument is "true" or
-     *             "false" (without quotes) to specify if G3DB files already in the folder can be overwritten ("true" for YES, the
-     *             default).
-     * @throws Exception
-     */
-    public static void main(String[] args) throws Exception {
-        if (args == null || args.length == 0) {
-            throw new Exception("You need to specify at least the input folder. Ex: java G3DBConverter /path/to/g3dmodels");
-        }
-
-        FileHandle inputFolder = new FileHandle(args[0]);
-        boolean overwrite = args.length < 2 || !"false".equalsIgnoreCase(args[1]);
-
-        G3DBConverter converter = new G3DBConverter();
-        converter.convertFolder(inputFolder, overwrite);
-    }
-
     /**
      * <p>
      * Convert all G3DJ files inside a folder to G3DB format (binary JSON).
