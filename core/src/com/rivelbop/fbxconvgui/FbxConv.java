@@ -2,6 +2,7 @@ package com.rivelbop.fbxconvgui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 
@@ -118,12 +119,13 @@ public final class FbxConv {
     }
 
     /**
-     * Renames the animation of the provided G3DJ file and exports it into the provided file path.
+     * Renames the animation of the provided G3DJ file path.
      *
-     * @param g3dj The G3DJ model file to alter.
-     * @param name The output file path.
+     * @param name The file path to the G3DJ file.
+     * @param value The name to set the animation to.
      */
-    public static void renameAnimation(JsonValue g3dj, FileHandle name, String value) {
+    public static void renameAnimation(FileHandle name, String value) {
+        JsonValue g3dj = new JsonReader().parse(name);
         g3dj.get("animations").child.get("id").set(value);
         try {
             FileWriter writer = new FileWriter(name.path());

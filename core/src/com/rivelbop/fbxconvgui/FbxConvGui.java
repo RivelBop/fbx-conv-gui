@@ -2,6 +2,7 @@ package com.rivelbop.fbxconvgui;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -14,6 +15,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -80,6 +82,16 @@ public class FbxConvGui extends ApplicationAdapter {
     @Override
     public void render() {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
+        if(Gdx.input.isKeyJustPressed(Input.Keys.TAB)) convUI.toggleVisibility();
+        if(Gdx.input.isKeyPressed(Input.Keys.GRAVE)) fileExplorer.setVisible(true);
+
+        // SHOULDN'T LOOP CONSTANTLY!
+        if(fileExplorer != null && fileExplorer.isVisible()) {
+            for(Actor a : convUI.getActors()) a.setVisible(false);
+        } else {
+            for(Actor a : convUI.getActors()) a.setVisible(true);
+        }
 
         if (animationController != null) animationController.update(Gdx.graphics.getDeltaTime());
 

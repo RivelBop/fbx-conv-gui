@@ -1,0 +1,3 @@
+Fix error potential - Not everything has an animation
+Layout UI
+UI visibilty with toggle fix since when explorer shown it can desync.

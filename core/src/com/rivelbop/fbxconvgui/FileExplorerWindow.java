@@ -77,6 +77,9 @@ public class FileExplorerWindow extends JFrame {
                             );
                     modelInstance = new ModelInstance(model);
                     animationController = new AnimationController(modelInstance);
+
+                    // NOT EVERYTHING HAS AN ANIMATION
+                    // GOTTA FIX THIS SHIT
                     animationController.setAnimation(
                             new JsonReader()
                                     .parse(Gdx.files.absolute(fbxFile.getAbsolutePath().replace(".fbx", ".g3dj")))
