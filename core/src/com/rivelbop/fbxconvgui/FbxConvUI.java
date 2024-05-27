@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
  */
 public class FbxConvUI extends Stage {
     private final Skin SKIN;
-    private boolean isVisible;
+    public boolean isVisible;
 
     /**
      * Creates a libGDX UI Stage, using the provided viewport. Contains all the in-app interface.
@@ -23,6 +23,7 @@ public class FbxConvUI extends Stage {
     public FbxConvUI(ScreenViewport viewport) {
         super(viewport);
         this.SKIN = new Skin(Gdx.files.internal("skin/metal-ui.json"));
+        this.isVisible = true;
 
         // Opens the file explorer
         TextButton modelButton = new TextButton("Open Model", SKIN);
@@ -78,8 +79,7 @@ public class FbxConvUI extends Stage {
      * Toggles the visibility of all UI components on the stage.
      */
     public void toggleVisibility() {
-        isVisible = !isVisible;
-        for (Actor a : getActors()) a.setVisible(isVisible);
+        if(FbxConvGui.fileExplorer != null && !FbxConvGui.fileExplorer.isVisible()) isVisible = !isVisible;
     }
 
     /**

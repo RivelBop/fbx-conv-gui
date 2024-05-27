@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.UBJsonReader;
 
 import javax.swing.*;
@@ -78,13 +79,11 @@ public class FileExplorerWindow extends JFrame {
                     modelInstance = new ModelInstance(model);
                     animationController = new AnimationController(modelInstance);
 
-                    // NOT EVERYTHING HAS AN ANIMATION
-                    // GOTTA FIX THIS SHIT
-                    animationController.setAnimation(
-                            new JsonReader()
-                                    .parse(Gdx.files.absolute(fbxFile.getAbsolutePath().replace(".fbx", ".g3dj")))
-                                    .get("animations").child.get("id").asString(), -1
-                    );
+                    JsonValue animation = new JsonReader()
+                            .parse(Gdx.files.absolute(fbxFile.getAbsolutePath().replace(".fbx", ".g3dj")))
+                            .get("animations");
+                    if(animation.child != null) animationController.setAnimation(animation.child.get("id").asString(), -1);
+                    else animationController = null;
                 });
             } else if (e.getActionCommand().equals(JFileChooser.CANCEL_SELECTION)) setVisible(false);
         });

@@ -13,9 +13,14 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
+import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.UBJsonReader;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -32,8 +37,9 @@ public class FbxConvGui extends ApplicationAdapter {
     public static FileExplorerWindow fileExplorer;
     private InputMultiplexer inputMultiplexer;
 
-    public static PerspectiveCamera camera;
+    private boolean flyCam, oldFlyCam;
     private FirstPersonCameraController cameraController;
+    public static PerspectiveCamera camera;
     public ExtendViewport viewport;
 
     private FbxConvUI convUI;
@@ -41,6 +47,7 @@ public class FbxConvGui extends ApplicationAdapter {
     private ModelBatch modelBatch;
     private Environment environment;
 
+    private ModelInstance sky;
     public static Model model;
     public static ModelInstance modelInstance;
     public static AnimationController animationController;
@@ -55,9 +62,11 @@ public class FbxConvGui extends ApplicationAdapter {
     @Override
     public void create() {
         // Create camera and viewport
+        DefaultShader.defaultCullFace = 0;
         camera = new PerspectiveCamera();
+        camera.far = 0f;
         cameraController = new FirstPersonCameraController(camera);
-        cameraController.autoUpdate = true;
+        cameraController.autoUpdate = false;
         viewport = new ExtendViewport(PREF_WIDTH, PREF_HEIGHT, camera);
 
         // Create in-app UI
@@ -69,10 +78,11 @@ public class FbxConvGui extends ApplicationAdapter {
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
+        sky = new ModelInstance(new G3dModelLoader(new UBJsonReader()).loadModel(Gdx.files.internal("skyspherething.g3db")));
+
         // Handle input
         inputMultiplexer = new InputMultiplexer();
         inputMultiplexer.addProcessor(convUI);
-        inputMultiplexer.addProcessor(cameraController);
         Gdx.input.setInputProcessor(inputMultiplexer);
     }
 
@@ -83,27 +93,46 @@ public class FbxConvGui extends ApplicationAdapter {
     public void render() {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
+        // Toggle UI visibility
         if(Gdx.input.isKeyJustPressed(Input.Keys.TAB)) convUI.toggleVisibility();
         if(Gdx.input.isKeyPressed(Input.Keys.GRAVE)) fileExplorer.setVisible(true);
 
-        // SHOULDN'T LOOP CONSTANTLY!
+        // Toggle Fly Camera
+        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) flyCam = !flyCam;
+
+        // Set each libGDX Stage UI element's visibility according to what it should be
         if(fileExplorer != null && fileExplorer.isVisible()) {
             for(Actor a : convUI.getActors()) a.setVisible(false);
         } else {
-            for(Actor a : convUI.getActors()) a.setVisible(true);
+            for(Actor a : convUI.getActors()) a.setVisible(convUI.isVisible);
         }
 
         if (animationController != null) animationController.update(Gdx.graphics.getDeltaTime());
 
         // TEMPORARY
-        if (modelInstance != null) modelInstance.transform.setToScaling(0.1f, 0.1f, 0.1f);
+        //if (modelInstance != null) modelInstance.transform.setToScaling(0.1f, 0.1f, 0.1f);
         // TEMPORARY
 
-        viewport.apply();
-        cameraController.update();
+        // Toggles Fly Camera and Target Camera
+        if(flyCam) {
+            if(!oldFlyCam) {
+                inputMultiplexer.addProcessor(cameraController);
+                oldFlyCam = true;
+            }
+            cameraController.update();
+        } else {
+            if(oldFlyCam) {
+                inputMultiplexer.removeProcessor(cameraController);
+                oldFlyCam = false;
+            }
+            if (modelInstance != null) camera.lookAt(modelInstance.transform.getTranslation(new Vector3()));
+        }
 
+        camera.update(true);
+        viewport.apply();
         modelBatch.begin(camera);
         if (modelInstance != null) modelBatch.render(modelInstance, environment);
+        modelBatch.render(sky);
         modelBatch.end();
 
         convUI.render();
@@ -120,6 +149,7 @@ public class FbxConvGui extends ApplicationAdapter {
         fileExplorer.dispose();
         convUI.dispose();
         modelBatch.dispose();
+        sky.model.dispose();
         if (model != null) model.dispose();
         System.exit(0);
     }
