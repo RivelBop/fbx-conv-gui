@@ -82,7 +82,8 @@ public class FileExplorerWindow extends JFrame {
                     JsonValue animation = new JsonReader()
                             .parse(Gdx.files.absolute(fbxFile.getAbsolutePath().replace(".fbx", ".g3dj")))
                             .get("animations");
-                    if(animation.child != null) animationController.setAnimation(animation.child.get("id").asString(), -1);
+                    if (animation.child != null)
+                        animationController.setAnimation(animation.child.get("id").asString(), -1);
                     else animationController = null;
                 });
             } else if (e.getActionCommand().equals(JFileChooser.CANCEL_SELECTION)) setVisible(false);

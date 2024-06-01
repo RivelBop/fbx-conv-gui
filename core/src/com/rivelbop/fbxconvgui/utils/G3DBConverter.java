@@ -1,4 +1,4 @@
-package com.rivelbop.fbxconvgui;
+package com.rivelbop.fbxconvgui.utils;
 
 /*******************************************************************************
  * Copyright 2014 Questing Software

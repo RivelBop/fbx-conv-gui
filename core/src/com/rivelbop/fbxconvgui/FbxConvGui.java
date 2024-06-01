@@ -14,10 +14,8 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
-import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
-import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.UBJsonReader;
@@ -62,10 +60,10 @@ public class FbxConvGui extends ApplicationAdapter {
     @Override
     public void create() {
         // Create camera and viewport
-        DefaultShader.defaultCullFace = 0;
         camera = new PerspectiveCamera();
         camera.far = 0f;
         cameraController = new FirstPersonCameraController(camera);
+        cameraController.setVelocity(250f);
         cameraController.autoUpdate = false;
         viewport = new ExtendViewport(PREF_WIDTH, PREF_HEIGHT, camera);
 
@@ -78,7 +76,7 @@ public class FbxConvGui extends ApplicationAdapter {
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
-        sky = new ModelInstance(new G3dModelLoader(new UBJsonReader()).loadModel(Gdx.files.internal("skyspherething.g3db")));
+        sky = new ModelInstance(new G3dModelLoader(new UBJsonReader()).loadModel(Gdx.files.internal("sky.g3db")));
 
         // Handle input
         inputMultiplexer = new InputMultiplexer();
@@ -93,18 +91,21 @@ public class FbxConvGui extends ApplicationAdapter {
     public void render() {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
+        // If pressed ESC, unfocus all UI elements
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) convUI.unfocusAll();
+
         // Toggle UI visibility
-        if(Gdx.input.isKeyJustPressed(Input.Keys.TAB)) convUI.toggleVisibility();
-        if(Gdx.input.isKeyPressed(Input.Keys.GRAVE)) fileExplorer.setVisible(true);
+        if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) convUI.toggleVisibility();
+        if (Gdx.input.isKeyPressed(Input.Keys.GRAVE)) fileExplorer.setVisible(true);
 
         // Toggle Fly Camera
-        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) flyCam = !flyCam;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) flyCam = !flyCam;
 
         // Set each libGDX Stage UI element's visibility according to what it should be
-        if(fileExplorer != null && fileExplorer.isVisible()) {
-            for(Actor a : convUI.getActors()) a.setVisible(false);
+        if (fileExplorer != null && fileExplorer.isVisible()) {
+            for (Actor a : convUI.getActors()) a.setVisible(false);
         } else {
-            for(Actor a : convUI.getActors()) a.setVisible(convUI.isVisible);
+            for (Actor a : convUI.getActors()) a.setVisible(convUI.isVisible);
         }
 
         if (animationController != null) animationController.update(Gdx.graphics.getDeltaTime());
@@ -114,14 +115,14 @@ public class FbxConvGui extends ApplicationAdapter {
         // TEMPORARY
 
         // Toggles Fly Camera and Target Camera
-        if(flyCam) {
-            if(!oldFlyCam) {
+        if (flyCam) {
+            if (!oldFlyCam) {
                 inputMultiplexer.addProcessor(cameraController);
                 oldFlyCam = true;
             }
             cameraController.update();
         } else {
-            if(oldFlyCam) {
+            if (oldFlyCam) {
                 inputMultiplexer.removeProcessor(cameraController);
                 oldFlyCam = false;
             }
@@ -131,8 +132,8 @@ public class FbxConvGui extends ApplicationAdapter {
         camera.update(true);
         viewport.apply();
         modelBatch.begin(camera);
-        if (modelInstance != null) modelBatch.render(modelInstance, environment);
         modelBatch.render(sky);
+        if (modelInstance != null) modelBatch.render(modelInstance, environment);
         modelBatch.end();
 
         convUI.render();
