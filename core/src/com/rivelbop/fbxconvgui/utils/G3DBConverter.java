@@ -43,7 +43,7 @@ public class G3DBConverter {
      * @throws IOException If there's an exception while reading the input file or writing the output file.
      */
     public void convertFolder(FileHandle g3djFolder, boolean overwrite) throws IOException {
-        ArrayList<FileHandle> g3djFiles = new ArrayList<FileHandle>();
+        ArrayList<FileHandle> g3djFiles = new ArrayList<>();
 
         if (g3djFolder != null) {
             if (g3djFolder.isDirectory()) {
@@ -95,7 +95,7 @@ public class G3DBConverter {
         }
     }
 
-    /*
+    /**
      * Writes an array or object into binary JSON. Can be recursively called for inner objects/arrays.
      */
     private void writeObject(JsonValue root, UBJsonWriter writer) throws IOException {

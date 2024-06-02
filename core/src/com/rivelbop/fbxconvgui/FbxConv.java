@@ -26,10 +26,10 @@ public final class FbxConv {
      * Stores the supported operating system types.
      */
     private enum OS_TYPE {
-        NULL,
-        WIN, // Windows
-        MAC, // MacOS
-        NUX  // Linux
+        NULL, // UNKNOWN
+        WIN,  // Windows
+        MAC,  // MacOS
+        NUX   // Linux
     }
 
     /**
@@ -40,19 +40,15 @@ public final class FbxConv {
     static {
         // Determine OS
         String OS_NAME = System.getProperty("os.name").toLowerCase();
-        if (OS_NAME.contains("win"))
-            OS = OS_TYPE.WIN;
-        else if (OS_NAME.contains("mac"))
-            OS = OS_TYPE.MAC;
+        if (OS_NAME.contains("win")) OS = OS_TYPE.WIN;
+        else if (OS_NAME.contains("mac")) OS = OS_TYPE.MAC;
         else if (OS_NAME.contains("linux")) {
             OS = OS_TYPE.NUX;
 
             // Create a sample script for the user to run to install the necessary library file
             try {
-                FileWriter fileWriter = new FileWriter("install_library_path_script.txt");
+                FileWriter fileWriter = new FileWriter("install_library_path_script.sh");
                 fileWriter.write(
-                        "#!/bin/bash\n" +
-                                "# COPY AND PASTE INTO TERMINAL\n" +
                                 "sudo cp " + new File("binaries/linux/libfbxsdk.so").getAbsolutePath() + " /usr/lib\n" +
                                 "LD_LIBRARY_PATH=/usr/lib\n" +
                                 "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:" + new File("binaries/linux/libfbxsdk.so").getAbsolutePath() + "\n" +
@@ -63,8 +59,7 @@ public final class FbxConv {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        } else
-            OS = OS_TYPE.NULL;
+        } else OS = OS_TYPE.NULL;
         System.out.println("Detected OS: " + OS);
     }
 
@@ -86,10 +81,13 @@ public final class FbxConv {
                 return;
             case WIN:
                 Runtime.getRuntime().exec("binaries/win/fbx-conv.exe -f -o G3DJ " + fileName).waitFor();
+                break;
             case MAC:
                 Runtime.getRuntime().exec("binaries/mac/fbx-conv -f -o G3DJ " + fileName).waitFor();
+                break;
             case NUX:
                 Runtime.getRuntime().exec("binaries/linux/fbx-conv -f -o G3DJ " + fileName).waitFor();
+                break;
         }
 
         // Generate G3DB file

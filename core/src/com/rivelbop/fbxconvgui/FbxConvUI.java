@@ -17,7 +17,6 @@ import com.rivelbop.fbxconvgui.utils.Font;
  */
 public class FbxConvUI extends Stage {
     private final Skin SKIN;
-    private final Font.FontBuilder FONT_BUILDER;
     private final Font LABEL_FONT;
     public boolean isVisible;
 
@@ -51,14 +50,7 @@ public class FbxConvUI extends Stage {
         });
         addActor(sliderFov);
 
-        FONT_BUILDER = new Font.FontBuilder();
-        LABEL_FONT = FONT_BUILDER
-                .setFont(Gdx.files.internal("Hack.ttf"))
-                .setSize(20)
-                .build();
-
-
-        // set model textbox
+        // Alters the model's animation name
         TextField textBox = new TextField("Animation name", SKIN);
         textBox.setBounds(600f, 15f, 128f, 48f);
         textBox.setTextFieldListener((field, c) -> {
@@ -68,16 +60,26 @@ public class FbxConvUI extends Stage {
             }
         });
         addActor(textBox);
+
+        // Loads the 'Label' font
+        Font.FontBuilder fontBuilder = new Font.FontBuilder();
+        LABEL_FONT = fontBuilder
+                .setFont(Gdx.files.internal("Hack.ttf"))
+                .setSize(20)
+                .build();
+        fontBuilder.dispose();
     }
 
     /**
      * Updates and renders the Stage.
      */
     public void render() {
+        // Render Stage UI
         getViewport().apply(true);
         act();
         draw();
 
+        // Render Font UI
         SpriteBatch batch = (SpriteBatch) getBatch();
         batch.begin();
         LABEL_FONT.drawCenter(batch, "Animation name: ", 400, 45);

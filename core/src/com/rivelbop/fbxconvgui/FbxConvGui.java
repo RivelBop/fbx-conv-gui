@@ -61,7 +61,7 @@ public class FbxConvGui extends ApplicationAdapter {
     public void create() {
         // Create camera and viewport
         camera = new PerspectiveCamera();
-        camera.far = 0f;
+        camera.far = 10000f;
         cameraController = new FirstPersonCameraController(camera);
         cameraController.setVelocity(250f);
         cameraController.autoUpdate = false;
@@ -76,6 +76,7 @@ public class FbxConvGui extends ApplicationAdapter {
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
+        // Create the sky
         sky = new ModelInstance(new G3dModelLoader(new UBJsonReader()).loadModel(Gdx.files.internal("sky.g3db")));
 
         // Handle input
@@ -110,10 +111,6 @@ public class FbxConvGui extends ApplicationAdapter {
 
         if (animationController != null) animationController.update(Gdx.graphics.getDeltaTime());
 
-        // TEMPORARY
-        //if (modelInstance != null) modelInstance.transform.setToScaling(0.1f, 0.1f, 0.1f);
-        // TEMPORARY
-
         // Toggles Fly Camera and Target Camera
         if (flyCam) {
             if (!oldFlyCam) {
@@ -129,8 +126,9 @@ public class FbxConvGui extends ApplicationAdapter {
             if (modelInstance != null) camera.lookAt(modelInstance.transform.getTranslation(new Vector3()));
         }
 
-        camera.update(true);
         viewport.apply();
+        camera.update(true);
+
         modelBatch.begin(camera);
         modelBatch.render(sky);
         if (modelInstance != null) modelBatch.render(modelInstance, environment);
@@ -147,11 +145,16 @@ public class FbxConvGui extends ApplicationAdapter {
 
     @Override
     public void dispose() {
+        // UI
         fileExplorer.dispose();
         convUI.dispose();
+
+        // 3D Model View
         modelBatch.dispose();
-        sky.model.dispose();
         if (model != null) model.dispose();
+        sky.model.dispose();
+
+        // Java
         System.exit(0);
     }
 }
