@@ -49,7 +49,7 @@ public class FileExplorerWindow extends JFrame {
         explorer.setFileFilter(new FileFilter() {
             @Override
             public boolean accept(File f) {
-                return f.isDirectory() || f.getName().toLowerCase().endsWith(".fbx");
+                return f.isDirectory() || f.getName().endsWith(".fbx");
             }
 
             @Override
@@ -64,7 +64,7 @@ public class FileExplorerWindow extends JFrame {
                 // Converts the selected FBX file to both G3DB and G3DJ
                 File fbxFile = explorer.getSelectedFile();
                 try {
-                    FbxConv.convertModel(fbxFile.getAbsolutePath());
+                    FbxConv.convertModel(fbxFile);
                 } catch (IOException | InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
