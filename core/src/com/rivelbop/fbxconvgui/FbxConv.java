@@ -77,13 +77,13 @@ public final class FbxConv {
      * @throws IOException          Error during command execution or conversion process.
      * @throws InterruptedException Error when waiting for command execution to complete.
      */
-    public static void convertModel(File fbxFile) throws IOException, InterruptedException {
+    public static File convertModel(File fbxFile) throws IOException, InterruptedException {
         // Generate G3DJ file
         String fileName = fbxFile.getAbsolutePath();
         switch (OS) {
             case NULL:
                 System.err.println("Operating System Is Unknown!");
-                return;
+                return new File("");
             case WIN:
                 Runtime.getRuntime().exec("binaries/win/fbx-conv.exe -f -o G3DJ " + fileName).waitFor();
                 break;
@@ -95,25 +95,30 @@ public final class FbxConv {
                 break;
         }
 
-        // Move to newly created folder for file
-        File directory = new File(fileName.replace(".fbx", ".fbm"));
-        File newDirectory = new File(directory.getParent() + "/" + directory.getName().replace(".fbm", ""));
+        // Create a folder to store converted files to
+
+        /*File oldDirectory = new File(fileName.replace(".fbx", ".fbm"));
+        File newDirectory = new File(oldDirectory.getParent() + "/" + oldDirectory.getName().replace(".fbm", ""));
         if (newDirectory.isDirectory()) purgeDirectory(newDirectory);
-        directory.renameTo(newDirectory);
+        oldDirectory.renameTo(newDirectory);*/
+        
+        File newDirectory = new File(fileName.replace(".fbx", ".fbm"));
 
-        System.out.println(newDirectory.getAbsolutePath());
-        System.out.println(newDirectory.exists());
+        // Move the G3DJ file into the new folder
+        File oldG3djFile = new File(fileName.replace(".fbx", ".g3dj"));
+        File newG3djFile = new File(newDirectory.getAbsolutePath() + "/" + oldG3djFile.getName());
+        oldG3djFile.renameTo(newG3djFile);
 
-        File g3djFile = new File(fileName.replace(".fbx", ".g3dj"));
-        g3djFile.renameTo(new File(directory.getAbsolutePath() + "/" + g3djFile.getName()));
-
-        fbxFile.renameTo(new File(directory.getAbsolutePath() + "/" + fbxFile.getName()));
-        fileName = fbxFile.getAbsolutePath();
+        // Move the FBX file into the new folder
+        File newFbxFile = new File(newDirectory.getAbsolutePath() + "/" + fbxFile.getName());
+        fbxFile.renameTo(newFbxFile);
+        fileName = newFbxFile.getAbsolutePath();
 
         // Generate G3DB file
-        // directory.getAbsolutePath() + "/" + g3djFile.getName()
-        G3DB_CONVERTER.convert(Gdx.files.absolute(g3djFile.getAbsolutePath()), true);
+        G3DB_CONVERTER.convert(Gdx.files.absolute(newG3djFile.getAbsolutePath()), true);
         System.out.println("Converted FBX Model: " + fileName);
+
+        return newFbxFile;
     }
 
     /**

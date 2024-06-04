@@ -62,30 +62,36 @@ public class FileExplorerWindow extends JFrame {
         explorer.addActionListener(e -> {
             if (e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION)) {
                 // Converts the selected FBX file to both G3DB and G3DJ
-                File fbxFile = explorer.getSelectedFile();
+                File fbxFile;
                 try {
-                    FbxConv.convertModel(fbxFile);
+                    fbxFile = FbxConv.convertModel(explorer.getSelectedFile());
                 } catch (IOException | InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
                 setVisible(false);
 
                 // Sets the in-app model to the generated G3DB model
+                String fbxFilePath = fbxFile.getAbsolutePath();
                 Gdx.app.postRunnable(() -> {
                     model = new G3dModelLoader(new UBJsonReader())
                             .loadModel(
-                                    Gdx.files.absolute(fbxFile.getAbsolutePath().replace(".fbx", ".g3db"))
+                                    Gdx.files.absolute(fbxFilePath.replace(".fbx", ".g3db"))
                             );
                     modelInstance = new ModelInstance(model);
                     animationController = new AnimationController(modelInstance);
 
                     JsonValue animation = new JsonReader()
-                            .parse(Gdx.files.absolute(fbxFile.getAbsolutePath().replace(".fbx", ".g3dj")))
+                            .parse(Gdx.files.absolute(fbxFilePath.replace(".fbx", ".g3dj")))
                             .get("animations");
                     if (animation.child != null)
                         animationController.setAnimation(animation.child.get("id").asString(), -1);
                     else animationController = null;
                 });
+
+                // Move FBX file back out of the new model directory
+                File tempFbxFile = new File(fbxFile.getParentFile().getParent() + "/" + fbxFile.getName());
+                fbxFile.renameTo(tempFbxFile);
+                explorer.setSelectedFile(tempFbxFile);
             } else if (e.getActionCommand().equals(JFileChooser.CANCEL_SELECTION)) setVisible(false);
         });
     }

@@ -1,17 +1,15 @@
-Layout UI
-Toggle between rotate around the object and fps camera
-Add model scale slider
-
 David:
 Fix texture move from/into folder to avoid crash
 Add combination support
 Clean up with file checks and what not, for example dont check if dir
+Check for other moving file errors in this or other projects
 etc.
 
 Philip:
 Fix UI
 Work on adding more camera features (rotation around object)
 Add way to combine
-Make the font smaller
 Hide the font when necessary
+Layout UI
+Add model scale slider
 etc.
