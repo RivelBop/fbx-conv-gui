@@ -2,8 +2,6 @@ package com.rivelbop.fbxconvgui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
@@ -21,6 +19,7 @@ public class FbxConvUI extends Stage {
     private final Skin SKIN;
     private final Font LABEL_FONT;
     public boolean isVisible;
+
     /**
      * Creates a libGDX UI Stage, using the provided viewport. Contains all the in-app interface.
      *
@@ -31,19 +30,6 @@ public class FbxConvUI extends Stage {
         this.SKIN = new Skin(Gdx.files.internal("skin/metal-ui.json"));
         this.isVisible = true;
 
-        TextButton shortcutWindowButton = new TextButton("Shortcuts", SKIN);
-        shortcutWindowButton.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if(event.isHandled()) {
-                    ShortCutsWindow.frame.setVisible(true);
-                }
-                return false;
-            }
-        });
-        shortcutWindowButton.setBounds(100, 100, 125f, 46f);
-        addActor(shortcutWindowButton);
-
         // Opens the file explorer
         TextButton modelButton = new TextButton("Open Model", SKIN);
         modelButton.addListener(e -> {
@@ -52,6 +38,17 @@ public class FbxConvUI extends Stage {
         });
         modelButton.setBounds(15f, 15f, 125f, 46f);
         addActor(modelButton);
+
+        // Opens the shortcut window
+        TextButton shortcutsWindowButton = new TextButton("Shortcuts", SKIN);
+        shortcutsWindowButton.addListener(event -> {
+            if (event.isHandled()) {
+                FbxConvGui.shortCutsWindow.setVisible(true);
+            }
+            return false;
+        });
+        shortcutsWindowButton.setBounds(100, 100, 125f, 46f);
+        addActor(shortcutsWindowButton);
 
         // Sets the perspective camera's FOV
         Slider sliderFov = new Slider(30f, 120f, 2f, false, SKIN);
@@ -67,7 +64,7 @@ public class FbxConvUI extends Stage {
         // Alters the model's animation name
         TextField textBox = new TextField("Animation name", SKIN);
         textBox.setBounds(300f, 30f, 128f, 48f);
-        textBox.setTextFieldListener((field, c) -> {
+        textBox.setTextFieldListener((f, c) -> {
             if (c == '\n') {
                 System.out.println("HEY");
                 FbxConv.renameAnimation(Gdx.files.absolute(FbxConvGui.fileExplorer.explorer.getSelectedFile().getAbsolutePath().replace(".fbx", ".g3dj")), textBox.getText());

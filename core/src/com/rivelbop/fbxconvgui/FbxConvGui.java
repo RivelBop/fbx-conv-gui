@@ -30,22 +30,29 @@ import javax.swing.*;
  * @author David/Philip Jerzak (RivelBop)
  */
 public class FbxConvGui extends ApplicationAdapter {
+    // View Dimensions
     public final static int PREF_HEIGHT = 720, PREF_WIDTH = PREF_HEIGHT * 16 / 9;
 
+    // UI
     public static FileExplorerWindow fileExplorer;
-    private InputMultiplexer inputMultiplexer;
+    public static ShortCutsWindow shortCutsWindow;
+    private FbxConvUI convUI;
 
-    private boolean flyCam, oldFlyCam;
+    // Input Processes
+    private InputMultiplexer inputMultiplexer;
     private FirstPersonCameraController cameraController;
+
+    // Camera and Viewport
+    private boolean flyCam, oldFlyCam;
     public static PerspectiveCamera camera;
     public ExtendViewport viewport;
 
-    private FbxConvUI convUI;
-
+    // 3D Model Rendering Environment
     private ModelBatch modelBatch;
     private Environment environment;
-
     private ModelInstance sky;
+
+    // Model Preview
     public static Model model;
     public static ModelInstance modelInstance;
     public static AnimationController animationController;
@@ -54,7 +61,10 @@ public class FbxConvGui extends ApplicationAdapter {
      * Create the Java Swing File Explorer on separate thread to avoid interference with LWJGL thread.
      */
     public FbxConvGui() {
-        SwingUtilities.invokeLater(() -> fileExplorer = new FileExplorerWindow());
+        SwingUtilities.invokeLater(() -> {
+            fileExplorer = new FileExplorerWindow();
+            shortCutsWindow = new ShortCutsWindow();
+        });
     }
 
     @Override
@@ -75,8 +85,6 @@ public class FbxConvGui extends ApplicationAdapter {
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
-
-        // Create the sky
         sky = new ModelInstance(new G3dModelLoader(new UBJsonReader()).loadModel(Gdx.files.internal("sky.g3db")));
 
         // Handle input
@@ -92,7 +100,7 @@ public class FbxConvGui extends ApplicationAdapter {
     public void render() {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        // If pressed ESC, unfocus all UI elements
+        // If pressed ESC, all UI elements are unfocused
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) convUI.unfocusAll();
 
         // Toggle UI visibility
@@ -102,13 +110,13 @@ public class FbxConvGui extends ApplicationAdapter {
         // Toggle Fly Camera
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) flyCam = !flyCam;
 
-        // Set each libGDX Stage UI element's visibility according to what it should be
-        if (fileExplorer != null && fileExplorer.isVisible()) {
+        // Adjust libGDX stage UI element's visibility according to what it should be
+        if (fileExplorer != null && fileExplorer.isVisible())
             for (Actor a : convUI.getActors()) a.setVisible(false);
-        } else {
+        else
             for (Actor a : convUI.getActors()) a.setVisible(convUI.isVisible);
-        }
 
+        // Update model animations, if applicable
         if (animationController != null) animationController.update(Gdx.graphics.getDeltaTime());
 
         // Toggles Fly Camera and Target Camera

@@ -1,32 +1,22 @@
 package com.rivelbop.fbxconvgui;
+
 import javax.swing.*;
+import java.awt.*;
 
-public class ShortCutsWindow{
-
-    public static JFrame frame;
-
+public class ShortCutsWindow extends JFrame {
     public ShortCutsWindow() {
+        super("Shortcuts");
+        setLayout(new GridLayout(3, 0, 0, 32));
 
-        // TAB shortcut
-        JLabel tabText = new JLabel("TAB: hides UI");
-        tabText.setBounds(0,0,32,32);
+        add(new JLabel("TAB : Hides UI"));
+        add(new JLabel("SPACE : Changes camera to rotating around the object"));
+        add(new JLabel("TILDE(`) : Makes the file explorer window pop up"));
+        pack();
 
-        // SPACE shortcut
-        JLabel spaceText = new JLabel("SPACE: changes camera to rotating around the object");
-        spaceText.setBounds(0,50,32,32);
-
-        // Tilde shortcut
-        JLabel tildeText = new JLabel("Tilde(`): Makes the file explorer window pop up");
-
-        // makes window and adds components
-        frame = new JFrame();
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setVisible(false);
-        frame.setResizable(false);
-        frame.setSize(300, 300);
-        frame.setLayout(null);
-        frame.add(tabText);
-        frame.add(spaceText);
-        frame.add(tildeText);
+        setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setResizable(false);
+        setAlwaysOnTop(true);
+        setVisible(false);
     }
 }

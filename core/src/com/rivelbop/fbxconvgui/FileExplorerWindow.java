@@ -29,12 +29,6 @@ public class FileExplorerWindow extends JFrame {
      */
     public FileExplorerWindow() {
         super("Select FBX File");
-
-        JPanel panel = new JPanel(new BorderLayout());
-        createFileExplorer();
-        panel.add(explorer, BorderLayout.CENTER);
-        add(panel);
-
         createWindow();
     }
 
@@ -89,9 +83,12 @@ public class FileExplorerWindow extends JFrame {
                 });
 
                 // Move FBX file back out of the new model directory
-                File tempFbxFile = new File(fbxFile.getParentFile().getParent() + "/" + fbxFile.getName());
-                fbxFile.renameTo(tempFbxFile);
-                explorer.setSelectedFile(tempFbxFile);
+                if (fbxFile.getParent().endsWith(".fbm")) {
+                    File tempFbxFile = new File(fbxFile.getParentFile().getParent() + "/" + fbxFile.getName());
+                    if (fbxFile.renameTo(tempFbxFile))
+                        System.out.println(tempFbxFile.getName() + " -> " + tempFbxFile.getParent() + "/");
+                    explorer.setSelectedFile(tempFbxFile);
+                }
             } else if (e.getActionCommand().equals(JFileChooser.CANCEL_SELECTION)) setVisible(false);
         });
     }
@@ -100,17 +97,19 @@ public class FileExplorerWindow extends JFrame {
      * Creates a JFrame that is hidden on close, 350-650 size, and always on top.
      */
     private void createWindow() {
-        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        setLayout(new BorderLayout());
+        createFileExplorer();
+        add(explorer, BorderLayout.CENTER);
 
         setMinimumSize(new Dimension(350, 350));
         setPreferredSize(new Dimension(450, 450));
         setMaximumSize(new Dimension(650, 650));
         setSize(450, 450);
-
-        setLocationRelativeTo(null);
-
         pack();
-        setVisible(true);
+
+        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        setLocationRelativeTo(null);
         setAlwaysOnTop(true);
+        setVisible(false);
     }
 }
