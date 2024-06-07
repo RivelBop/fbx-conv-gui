@@ -73,7 +73,6 @@ public class FbxConvGui extends ApplicationAdapter {
         camera = new PerspectiveCamera();
         camera.far = 10000f;
         cameraController = new FirstPersonCameraController(camera);
-        cameraController.setVelocity(250f);
         cameraController.autoUpdate = false;
         viewport = new ExtendViewport(PREF_WIDTH, PREF_HEIGHT, camera);
 
@@ -109,6 +108,10 @@ public class FbxConvGui extends ApplicationAdapter {
 
         // Toggle Fly Camera
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) flyCam = !flyCam;
+
+        if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+            cameraController.setVelocity(1000f);
+        } else cameraController.setVelocity(500f);
 
         // Adjust libGDX stage UI element's visibility according to what it should be
         if (fileExplorer != null && fileExplorer.isVisible())
