@@ -17,8 +17,6 @@ import java.io.IOException;
  * @author David Jerzak (RivelBop)
  */
 public final class FbxConv {
-    // Hey this is David
-    // hello world, how are you
     /**
      * Used to convert G3DJ to G3DB.
      */
@@ -80,7 +78,7 @@ public final class FbxConv {
         String fileName = fbxFile.getAbsolutePath();
         switch (OS) {
             case NULL:
-                System.err.println("Operating System Is Unknown!");
+                System.err.println("Operating System is Unknown!");
                 return fbxFile;
             case WIN:
                 Runtime.getRuntime().exec("binaries/win/fbx-conv.exe -f -o G3DJ " + fileName).waitFor();
@@ -137,7 +135,10 @@ public final class FbxConv {
         // Write the new data for model1 back into its G3DJ file
         try {
             FileWriter writer = new FileWriter(name.path());
-            writer.write(v1.toJson(JsonWriter.OutputType.json));
+            writer.write(v1.prettyPrint(new JsonValue.PrettyPrintSettings() {{
+                outputType = JsonWriter.OutputType.json;
+                wrapNumericArrays = true;
+            }}));
             writer.close();
             System.out.println(v1.name() + " added to " + v2.name());
         } catch (IOException e) {
@@ -153,14 +154,21 @@ public final class FbxConv {
      */
     public static void renameAnimation(FileHandle name, String value) {
         JsonValue g3dj = new JsonReader().parse(name);
-        g3dj.get("animations").child.get("id").set(value);
-        try {
-            FileWriter writer = new FileWriter(name.path());
-            writer.write(g3dj.toJson(JsonWriter.OutputType.json));
-            writer.close();
-            System.out.println("Successfully rename G3DJ animation to: " + value);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        JsonValue animation = g3dj.get("animations").child;
+
+        if (animation != null) {
+            animation.get("id").set(value);
+            try {
+                FileWriter writer = new FileWriter(name.path());
+                writer.write(g3dj.prettyPrint(new JsonValue.PrettyPrintSettings() {{
+                    outputType = JsonWriter.OutputType.json;
+                    wrapNumericArrays = true;
+                }}));
+                writer.close();
+                System.out.println("Successfully renamed G3DJ animation to: " + value);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

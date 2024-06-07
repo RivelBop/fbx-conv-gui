@@ -1,9 +1,6 @@
 David:
-Fix texture move from/into folder to avoid crash
 Add combination support
-Clean up with file checks and what not, for example dont check if dir
-Check for other moving file errors in this or other projects
-etc.
+Store the G3DJ file, G3DB file
 
 Philip:
 Fix UI

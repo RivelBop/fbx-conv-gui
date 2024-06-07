@@ -1,6 +1,7 @@
 package com.rivelbop.fbxconvgui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -9,6 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.rivelbop.fbxconvgui.utils.Font;
+
+import java.io.File;
 
 /**
  * Handles all in-app UI (part of the GLFW window).
@@ -62,12 +65,21 @@ public class FbxConvUI extends Stage {
         addActor(sliderFov);
 
         // Alters the model's animation name
-        TextField textBox = new TextField("Animation name", SKIN);
+        TextField textBox = new TextField("", SKIN);
         textBox.setBounds(300f, 30f, 128f, 48f);
         textBox.setTextFieldListener((f, c) -> {
             if (c == '\n') {
-                System.out.println("HEY");
-                FbxConv.renameAnimation(Gdx.files.absolute(FbxConvGui.fileExplorer.explorer.getSelectedFile().getAbsolutePath().replace(".fbx", ".g3dj")), textBox.getText());
+                File fbxFile = FbxConvGui.fileExplorer.explorer.getSelectedFile();
+
+                if (fbxFile != null && fbxFile.exists()) {
+                    File fbmDir = new File(fbxFile.getParent() + "/" + fbxFile.getName().replace(".fbx", ".fbm"));
+                    FileHandle g3djFile;
+                    if (fbmDir.isDirectory())
+                        g3djFile = new FileHandle(fbmDir.getAbsolutePath() + "/" + fbxFile.getName().replace(".fbx", ".g3dj"));
+                    else
+                        g3djFile = new FileHandle(fbxFile.getAbsolutePath().replace(".fbx", ".g3dj"));
+                    FbxConv.renameAnimation(g3djFile, textBox.getText());
+                }
             }
         });
         addActor(textBox);
