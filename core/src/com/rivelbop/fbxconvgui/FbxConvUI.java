@@ -1,6 +1,7 @@
 package com.rivelbop.fbxconvgui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -9,6 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.rivelbop.fbxconvgui.utils.Font;
+
+import java.awt.*;
 
 /**
  * Handles all in-app UI (part of the GLFW window).
@@ -47,12 +50,12 @@ public class FbxConvUI extends Stage {
             }
             return false;
         });
-        shortcutsWindowButton.setBounds(100, 100, 125f, 46f);
+        shortcutsWindowButton.setBounds(0, 690, 64f, 32f);
         addActor(shortcutsWindowButton);
 
         // Sets the perspective camera's FOV
         Slider sliderFov = new Slider(30f, 120f, 2f, false, SKIN);
-        sliderFov.setBounds(153f, 15f, 128f, 48f);
+        sliderFov.setBounds(220f, 15f, 128f, 48f);
         sliderFov.setValue(70f);
         FbxConvGui.camera.fieldOfView = sliderFov.getValue();
         sliderFov.addListener(e -> {
@@ -62,8 +65,8 @@ public class FbxConvUI extends Stage {
         addActor(sliderFov);
 
         // Alters the model's animation name
-        TextField textBox = new TextField("Animation name", SKIN);
-        textBox.setBounds(300f, 30f, 128f, 48f);
+        TextField textBox = new TextField("", SKIN);
+        textBox.setBounds(220f, 60f, 128f, 48f);
         textBox.setTextFieldListener((f, c) -> {
             if (c == '\n') {
                 System.out.println("HEY");
@@ -79,6 +82,7 @@ public class FbxConvUI extends Stage {
                 .setSize(20)
                 .build();
         fontBuilder.dispose();
+
     }
 
     /**
@@ -90,10 +94,12 @@ public class FbxConvUI extends Stage {
         act();
         draw();
 
+
         // Render Font UI
         SpriteBatch batch = (SpriteBatch) getBatch();
         batch.begin();
-        LABEL_FONT.draw(batch, "Animation name: ", 0, 15);
+        LABEL_FONT.draw(batch, "Animation name: ", 20, 90);
+        LABEL_FONT.draw(batch, "Fov: ", 170, 48);
         batch.end();
     }
 

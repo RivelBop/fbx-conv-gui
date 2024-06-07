@@ -11,6 +11,7 @@ public class ShortCutsWindow extends JFrame {
         add(new JLabel("TAB : Hides UI"));
         add(new JLabel("SPACE : Changes camera to rotating around the object"));
         add(new JLabel("TILDE(`) : Makes the file explorer window pop up"));
+        add(new JLabel("SHIFT: Makes camera move faster"));
         pack();
 
         setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
