@@ -17,10 +17,13 @@ import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.UBJsonReader;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.rivelbop.fbxconvgui.ui.FbxConvUI;
+import com.rivelbop.fbxconvgui.ui.FileExplorerWindow;
+import com.rivelbop.fbxconvgui.ui.ShortCutsWindow;
+import com.rivelbop.fbxconvgui.utils.FbxConvModel;
 
 import javax.swing.*;
 
@@ -53,6 +56,7 @@ public class FbxConvGui extends ApplicationAdapter {
     private ModelInstance sky;
 
     // Model Preview
+    public static FbxConvModel fbxConvModel;
     public static Model model;
     public static ModelInstance modelInstance;
     public static AnimationController animationController;
@@ -103,21 +107,20 @@ public class FbxConvGui extends ApplicationAdapter {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) convUI.unfocusAll();
 
         // Toggle UI visibility
-        if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) convUI.toggleVisibility();
+        if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) {
+            convUI.toggleVisibility();
+            convUI.unfocusAll();
+        }
         if (Gdx.input.isKeyPressed(Input.Keys.GRAVE)) fileExplorer.setVisible(true);
 
         // Toggle Fly Camera
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) flyCam = !flyCam;
 
-        if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+        // Camera sprint
+        if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT))
             cameraController.setVelocity(1000f);
-        } else cameraController.setVelocity(500f);
-
-        // Adjust libGDX stage UI element's visibility according to what it should be
-        if (fileExplorer != null && fileExplorer.isVisible())
-            for (Actor a : convUI.getActors()) a.setVisible(false);
         else
-            for (Actor a : convUI.getActors()) a.setVisible(convUI.isVisible);
+            cameraController.setVelocity(500f);
 
         // Update model animations, if applicable
         if (animationController != null) animationController.update(Gdx.graphics.getDeltaTime());

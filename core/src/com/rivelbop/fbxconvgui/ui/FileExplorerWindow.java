@@ -1,4 +1,4 @@
-package com.rivelbop.fbxconvgui;
+package com.rivelbop.fbxconvgui.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
@@ -7,12 +7,12 @@ import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.UBJsonReader;
+import com.rivelbop.fbxconvgui.utils.FbxConv;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
 
 import static com.rivelbop.fbxconvgui.FbxConvGui.*;
 
@@ -56,12 +56,7 @@ public class FileExplorerWindow extends JFrame {
         explorer.addActionListener(e -> {
             if (e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION)) {
                 // Converts the selected FBX file to both G3DB and G3DJ
-                File fbxFile;
-                try {
-                    fbxFile = FbxConv.convertModel(explorer.getSelectedFile());
-                } catch (IOException | InterruptedException ex) {
-                    throw new RuntimeException(ex);
-                }
+                File fbxFile = FbxConv.convertModel(explorer.getSelectedFile());
                 setVisible(false);
 
                 // Sets the in-app model to the generated G3DB model

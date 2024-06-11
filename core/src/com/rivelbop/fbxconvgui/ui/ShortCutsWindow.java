@@ -1,4 +1,4 @@
-package com.rivelbop.fbxconvgui;
+package com.rivelbop.fbxconvgui.ui;
 
 import javax.swing.*;
 import java.awt.*;

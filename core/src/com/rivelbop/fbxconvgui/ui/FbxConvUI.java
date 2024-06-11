@@ -1,8 +1,7 @@
-package com.rivelbop.fbxconvgui;
+package com.rivelbop.fbxconvgui.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -10,10 +9,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.rivelbop.fbxconvgui.FbxConvGui;
+import com.rivelbop.fbxconvgui.utils.FbxConv;
 import com.rivelbop.fbxconvgui.utils.Font;
 
 import java.io.File;
-import java.awt.*;
 
 /**
  * Handles all in-app UI (part of the GLFW window).
@@ -100,18 +100,19 @@ public class FbxConvUI extends Stage {
      * Updates and renders the Stage.
      */
     public void render() {
-        // Render Stage UI
-        getViewport().apply(true);
-        act();
-        draw();
+        if (isVisible && !FbxConvGui.fileExplorer.isVisible()) {
+            // Render Stage UI
+            getViewport().apply(true);
+            act();
+            draw();
 
-
-        // Render Font UI
-        SpriteBatch batch = (SpriteBatch) getBatch();
-        batch.begin();
-        LABEL_FONT.draw(batch, "Animation name: ", 20, 90);
-        LABEL_FONT.draw(batch, "Fov: ", 170, 48);
-        batch.end();
+            // Render Font UI
+            SpriteBatch batch = (SpriteBatch) getBatch();
+            batch.begin();
+            LABEL_FONT.draw(batch, "Animation name: ", 20, 90);
+            LABEL_FONT.draw(batch, "Fov: ", 170, 48);
+            batch.end();
+        }
     }
 
     /**

@@ -1,12 +1,12 @@
 David:
 Add combination support
 Store the G3DJ file, G3DB file
+Remove the stage from the input handler when hidden and then return when it isn't
 
 Philip:
 Fix UI
 Work on adding more camera features (rotation around object)
 Add way to combine
-Hide the font when necessary
-Layout UI
 Add model scale slider
+Scroll to zoom
 etc.

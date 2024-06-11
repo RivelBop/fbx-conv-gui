@@ -1,11 +1,10 @@
-package com.rivelbop.fbxconvgui;
+package com.rivelbop.fbxconvgui.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
-import com.rivelbop.fbxconvgui.utils.G3DBConverter;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -70,25 +69,27 @@ public final class FbxConv {
      * Converts the FBX model at the provided path into both a G3DJ and G3DB model.
      *
      * @param fbxFile The FBX file to convert.
-     * @throws IOException          Error during command execution or conversion process.
-     * @throws InterruptedException Error when waiting for command execution to complete.
      */
-    public static File convertModel(File fbxFile) throws IOException, InterruptedException {
+    public static File convertModel(File fbxFile) {
         // Generate G3DJ from FBX
         String fileName = fbxFile.getAbsolutePath();
-        switch (OS) {
-            case NULL:
-                System.err.println("Operating System is Unknown!");
-                return fbxFile;
-            case WIN:
-                Runtime.getRuntime().exec("binaries/win/fbx-conv.exe -f -o G3DJ " + fileName).waitFor();
-                break;
-            case MAC:
-                Runtime.getRuntime().exec("binaries/mac/fbx-conv -f -o G3DJ " + fileName).waitFor();
-                break;
-            case NUX:
-                Runtime.getRuntime().exec("binaries/linux/fbx-conv -f -o G3DJ " + fileName).waitFor();
-                break;
+        try {
+            switch (OS) {
+                case NULL:
+                    System.err.println("Operating System is Unknown!");
+                    return fbxFile;
+                case WIN:
+                    Runtime.getRuntime().exec("binaries/win/fbx-conv.exe -f -o G3DJ " + fileName).waitFor();
+                    break;
+                case MAC:
+                    Runtime.getRuntime().exec("binaries/mac/fbx-conv -f -o G3DJ " + fileName).waitFor();
+                    break;
+                case NUX:
+                    Runtime.getRuntime().exec("binaries/linux/fbx-conv -f -o G3DJ " + fileName).waitFor();
+                    break;
+            }
+        } catch (InterruptedException | IOException e) {
+            throw new RuntimeException(e);
         }
 
         // Get available files to alter
@@ -98,8 +99,12 @@ public final class FbxConv {
 
         // If no asset folder was detected, convert at the FBX file location
         if (!directory.isDirectory()) {
-            G3DB_CONVERTER.convert(Gdx.files.absolute(g3djFile.getAbsolutePath()), true);
-            System.out.println("Converted FBX Model: " + fileName);
+            try {
+                G3DB_CONVERTER.convert(Gdx.files.absolute(g3djFile.getAbsolutePath()), true);
+                System.out.println("Converted FBX Model: " + fileName);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             return fbxFile;
         }
 
@@ -115,10 +120,13 @@ public final class FbxConv {
         fileName = newFbxFile.getAbsolutePath();
 
         // Generate G3DB file
-        G3DB_CONVERTER.convert(Gdx.files.absolute(newG3djFile.getAbsolutePath()), true);
-        System.out.println("Converted FBX Model: " + fileName);
-
-        return newFbxFile;
+        try {
+            G3DB_CONVERTER.convert(Gdx.files.absolute(newG3djFile.getAbsolutePath()), true);
+            System.out.println("Converted FBX Model: " + fileName);
+            return newFbxFile;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
