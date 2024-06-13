@@ -19,7 +19,7 @@ public final class FbxConv {
     /**
      * Used to convert G3DJ to G3DB.
      */
-    private static final G3DBConverter G3DB_CONVERTER = new G3DBConverter();
+    public static final G3DBConverter G3DB_CONVERTER = new G3DBConverter();
 
     /**
      * Stores the supported operating system types.

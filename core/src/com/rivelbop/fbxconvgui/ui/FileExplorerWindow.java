@@ -1,20 +1,14 @@
 package com.rivelbop.fbxconvgui.ui;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
-import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
-import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.UBJsonReader;
-import com.rivelbop.fbxconvgui.utils.FbxConv;
+import com.rivelbop.fbxconvgui.utils.FbxConvModel;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.io.File;
 
-import static com.rivelbop.fbxconvgui.FbxConvGui.*;
+import static com.rivelbop.fbxconvgui.FbxConvGui.model;
 
 /**
  * Creates a file explorer window using Java Swing.
@@ -48,42 +42,23 @@ public class FileExplorerWindow extends JFrame {
 
             @Override
             public String getDescription() {
-                return ".fbx (3D Model Format)";
+                return ".fbx";
             }
         });
 
         // If FBX file is selected, convert the model, and display it to the user
         explorer.addActionListener(e -> {
             if (e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION)) {
-                // Converts the selected FBX file to both G3DB and G3DJ
-                File fbxFile = FbxConv.convertModel(explorer.getSelectedFile());
                 setVisible(false);
 
-                // Sets the in-app model to the generated G3DB model
-                String fbxFilePath = fbxFile.getAbsolutePath();
+                FbxConvModel tempModel = model;
+                model = new FbxConvModel(explorer.getSelectedFile());
                 Gdx.app.postRunnable(() -> {
-                    model = new G3dModelLoader(new UBJsonReader())
-                            .loadModel(
-                                    Gdx.files.absolute(fbxFilePath.replace(".fbx", ".g3db"))
-                            );
-                    modelInstance = new ModelInstance(model);
-                    animationController = new AnimationController(modelInstance);
-
-                    JsonValue animation = new JsonReader()
-                            .parse(Gdx.files.absolute(fbxFilePath.replace(".fbx", ".g3dj")))
-                            .get("animations");
-                    if (animation.child != null)
-                        animationController.setAnimation(animation.child.get("id").asString(), -1);
-                    else animationController = null;
+                    if (tempModel != null) tempModel.dispose();
+                    model.reload();
                 });
 
-                // Move FBX file back out of the new model directory
-                if (fbxFile.getParent().endsWith(".fbm")) {
-                    File tempFbxFile = new File(fbxFile.getParentFile().getParent() + "/" + fbxFile.getName());
-                    if (fbxFile.renameTo(tempFbxFile))
-                        System.out.println(tempFbxFile.getName() + " -> " + tempFbxFile.getParent() + "/");
-                    explorer.setSelectedFile(tempFbxFile);
-                }
+                explorer.setSelectedFile(model.FBX);
             } else if (e.getActionCommand().equals(JFileChooser.CANCEL_SELECTION)) setVisible(false);
         });
     }

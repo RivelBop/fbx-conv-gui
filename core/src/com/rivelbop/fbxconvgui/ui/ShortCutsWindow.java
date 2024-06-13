@@ -3,18 +3,26 @@ package com.rivelbop.fbxconvgui.ui;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Displays all shortcuts to the user.
+ *
+ * @author Philip Jerzak (RivelBop)
+ */
 public class ShortCutsWindow extends JFrame {
     public ShortCutsWindow() {
         super("Shortcuts");
-        setLayout(new GridLayout(3, 0, 0, 32));
+        setLayout(new GridLayout(0, 1, 0, 16));
+        add(new JLabel());
 
-        add(new JLabel("TAB : Hides UI"));
-        add(new JLabel("SPACE : Changes camera to rotating around the object"));
-        add(new JLabel("TILDE(`) : Makes the file explorer window pop up"));
-        add(new JLabel("SHIFT: Makes camera move faster"));
+        add(new JLabel("  TAB : Hide UI.  "));
+        add(new JLabel("  SPACE : Change camera control.  "));
+        add(new JLabel("  TILDE(`) : Opens the fbx file explorer.  "));
+        add(new JLabel("  SHIFT : Makes the camera move faster.  "));
+
+        add(new JLabel());
         pack();
 
-        setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
         setAlwaysOnTop(true);

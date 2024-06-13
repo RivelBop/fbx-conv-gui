@@ -8,13 +8,11 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
-import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.UBJsonReader;
@@ -55,11 +53,8 @@ public class FbxConvGui extends ApplicationAdapter {
     private Environment environment;
     private ModelInstance sky;
 
-    // Model Preview
-    public static FbxConvModel fbxConvModel;
-    public static Model model;
-    public static ModelInstance modelInstance;
-    public static AnimationController animationController;
+    // Model
+    public static FbxConvModel model;
 
     /**
      * Create the Java Swing File Explorer on separate thread to avoid interference with LWJGL thread.
@@ -111,7 +106,7 @@ public class FbxConvGui extends ApplicationAdapter {
             convUI.toggleVisibility();
             convUI.unfocusAll();
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.GRAVE)) fileExplorer.setVisible(true);
+        if (fileExplorer != null && Gdx.input.isKeyPressed(Input.Keys.GRAVE)) fileExplorer.setVisible(true);
 
         // Toggle Fly Camera
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) flyCam = !flyCam;
@@ -123,7 +118,7 @@ public class FbxConvGui extends ApplicationAdapter {
             cameraController.setVelocity(500f);
 
         // Update model animations, if applicable
-        if (animationController != null) animationController.update(Gdx.graphics.getDeltaTime());
+        if (model != null) model.update();
 
         // Toggles Fly Camera and Target Camera
         if (flyCam) {
@@ -137,7 +132,8 @@ public class FbxConvGui extends ApplicationAdapter {
                 inputMultiplexer.removeProcessor(cameraController);
                 oldFlyCam = false;
             }
-            if (modelInstance != null) camera.lookAt(modelInstance.transform.getTranslation(new Vector3()));
+            if (model != null && model.instance != null)
+                camera.lookAt(model.instance.transform.getTranslation(new Vector3()));
         }
 
         viewport.apply();
@@ -145,7 +141,7 @@ public class FbxConvGui extends ApplicationAdapter {
 
         modelBatch.begin(camera);
         modelBatch.render(sky);
-        if (modelInstance != null) modelBatch.render(modelInstance, environment);
+        if (model != null) model.render(modelBatch, environment);
         modelBatch.end();
 
         convUI.render();

@@ -1,7 +1,6 @@
 package com.rivelbop.fbxconvgui.ui;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -11,9 +10,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.rivelbop.fbxconvgui.FbxConvGui;
 import com.rivelbop.fbxconvgui.utils.FbxConv;
+import com.rivelbop.fbxconvgui.utils.FbxConvModel;
 import com.rivelbop.fbxconvgui.utils.Font;
 
-import java.io.File;
+import java.io.IOException;
 
 /**
  * Handles all in-app UI (part of the GLFW window).
@@ -47,15 +47,13 @@ public class FbxConvUI extends Stage {
         // Opens the shortcut window
         TextButton shortcutsWindowButton = new TextButton("Shortcuts", SKIN);
         shortcutsWindowButton.addListener(event -> {
-            if (event.isHandled()) {
-                FbxConvGui.shortCutsWindow.setVisible(true);
-            }
+            if (event.isHandled()) FbxConvGui.shortCutsWindow.setVisible(true);
             return false;
         });
         shortcutsWindowButton.setBounds(0, 690, 64f, 32f);
         addActor(shortcutsWindowButton);
 
-        // Sets the perspective camera's FOV
+        // Sets the camera's FOV
         Slider sliderFov = new Slider(30f, 120f, 2f, false, SKIN);
         sliderFov.setBounds(220f, 15f, 128f, 48f);
         sliderFov.setValue(70f);
@@ -66,21 +64,20 @@ public class FbxConvUI extends Stage {
         });
         addActor(sliderFov);
 
-        // Alters the model's animation name
+        // Alters the model animation name
         TextField textBox = new TextField("", SKIN);
         textBox.setBounds(220f, 60f, 128f, 48f);
         textBox.setTextFieldListener((f, c) -> {
             if (c == '\n') {
-                File fbxFile = FbxConvGui.fileExplorer.explorer.getSelectedFile();
-
-                if (fbxFile != null && fbxFile.exists()) {
-                    File fbmDir = new File(fbxFile.getParent() + "/" + fbxFile.getName().replace(".fbx", ".fbm"));
-                    FileHandle g3djFile;
-                    if (fbmDir.isDirectory())
-                        g3djFile = new FileHandle(fbmDir.getAbsolutePath() + "/" + fbxFile.getName().replace(".fbx", ".g3dj"));
-                    else
-                        g3djFile = new FileHandle(fbxFile.getAbsolutePath().replace(".fbx", ".g3dj"));
-                    FbxConv.renameAnimation(g3djFile, textBox.getText());
+                FbxConvModel fbxConvModel = FbxConvGui.model;
+                if (fbxConvModel != null) {
+                    FbxConv.renameAnimation(fbxConvModel.G3DJ_HANDLE, textBox.getText());
+                    try {
+                        FbxConv.G3DB_CONVERTER.convert(FbxConvGui.model.G3DJ_HANDLE, true);
+                        FbxConvGui.model.reload();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         });
@@ -88,19 +85,18 @@ public class FbxConvUI extends Stage {
 
         // Loads the 'Label' font
         Font.FontBuilder fontBuilder = new Font.FontBuilder();
-        LABEL_FONT = fontBuilder
+        this.LABEL_FONT = fontBuilder
                 .setFont(Gdx.files.internal("Hack.ttf"))
                 .setSize(20)
                 .build();
         fontBuilder.dispose();
-
     }
 
     /**
      * Updates and renders the Stage.
      */
     public void render() {
-        if (isVisible && !FbxConvGui.fileExplorer.isVisible()) {
+        if (isVisible && FbxConvGui.fileExplorer != null && !FbxConvGui.fileExplorer.isVisible()) {
             // Render Stage UI
             getViewport().apply(true);
             act();
@@ -133,11 +129,12 @@ public class FbxConvUI extends Stage {
     }
 
     /**
-     * Disposes of both the stage and skin applied to each element.
+     * Disposes of the stage, skin, and font.
      */
     @Override
     public void dispose() {
         super.dispose();
         SKIN.dispose();
+        LABEL_FONT.dispose();
     }
 }
