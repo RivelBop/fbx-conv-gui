@@ -21,6 +21,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.rivelbop.fbxconvgui.ui.FbxConvUI;
 import com.rivelbop.fbxconvgui.ui.FileExplorerWindow;
 import com.rivelbop.fbxconvgui.ui.ShortCutsWindow;
+import com.rivelbop.fbxconvgui.utils.FbxConv;
 import com.rivelbop.fbxconvgui.utils.FbxConvModel;
 
 import javax.swing.*;
@@ -89,6 +90,8 @@ public class FbxConvGui extends ApplicationAdapter {
         inputMultiplexer = new InputMultiplexer();
         inputMultiplexer.addProcessor(convUI);
         Gdx.input.setInputProcessor(inputMultiplexer);
+        
+        FbxConv.combineG3DJ(Gdx.files.absolute("/home/djerzak/Downloads/innershaft/Idle.fbm/Idle.g3dj"), Gdx.files.absolute("/home/djerzak/Downloads/innershaft/Walking.fbm/Walking.g3dj"));
     }
 
     /**
@@ -122,7 +125,7 @@ public class FbxConvGui extends ApplicationAdapter {
 
         // Toggles Fly Camera and Target Camera
         if (flyCam) {
-            if (!oldFlyCam) {
+            if (!oldFlyCam && !convUI.isFocused()) {
                 inputMultiplexer.addProcessor(cameraController);
                 oldFlyCam = true;
             }
@@ -134,6 +137,12 @@ public class FbxConvGui extends ApplicationAdapter {
             }
             if (model != null && model.instance != null)
                 camera.lookAt(model.instance.transform.getTranslation(new Vector3()));
+        }
+
+        // If the UI is in focus, don't allow the user to control the camera
+        if(convUI.isFocused()) {
+            inputMultiplexer.removeProcessor(cameraController);
+            oldFlyCam = false;
         }
 
         viewport.apply();

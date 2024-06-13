@@ -25,6 +25,9 @@ public class FbxConvUI extends Stage {
     private final Font LABEL_FONT;
     public boolean isVisible;
 
+    // GUI Components
+    private TextButton shortcutsWindowButton;
+
     /**
      * Creates a libGDX UI Stage, using the provided viewport. Contains all the in-app interface.
      *
@@ -45,33 +48,32 @@ public class FbxConvUI extends Stage {
         addActor(modelButton);
 
         // Opens the shortcut window
-        TextButton shortcutsWindowButton = new TextButton("Shortcuts", SKIN);
+        shortcutsWindowButton = new TextButton("Shortcuts", SKIN);
         shortcutsWindowButton.addListener(event -> {
             if (event.isHandled()) FbxConvGui.shortCutsWindow.setVisible(true);
             return false;
         });
-        shortcutsWindowButton.setBounds(0, 690, 64f, 32f);
         addActor(shortcutsWindowButton);
 
         // Sets the camera's FOV
-        Slider sliderFov = new Slider(30f, 120f, 2f, false, SKIN);
-        sliderFov.setBounds(220f, 15f, 128f, 48f);
-        sliderFov.setValue(70f);
-        FbxConvGui.camera.fieldOfView = sliderFov.getValue();
-        sliderFov.addListener(e -> {
-            FbxConvGui.camera.fieldOfView = sliderFov.getValue();
+        Slider fovSlider = new Slider(30f, 120f, 2f, false, SKIN);
+        fovSlider.setBounds(220f, 15f, 128f, 48f);
+        fovSlider.setValue(70f);
+        FbxConvGui.camera.fieldOfView = fovSlider.getValue();
+        fovSlider.addListener(e -> {
+            FbxConvGui.camera.fieldOfView = fovSlider.getValue();
             return false;
         });
-        addActor(sliderFov);
+        addActor(fovSlider);
 
         // Alters the model animation name
-        TextField textBox = new TextField("", SKIN);
-        textBox.setBounds(220f, 60f, 128f, 48f);
-        textBox.setTextFieldListener((f, c) -> {
+        TextField animationField = new TextField("", SKIN);
+        animationField.setBounds(220f, 60f, 128f, 48f);
+        animationField.setTextFieldListener((f, c) -> {
             if (c == '\n') {
                 FbxConvModel fbxConvModel = FbxConvGui.model;
                 if (fbxConvModel != null) {
-                    FbxConv.renameAnimation(fbxConvModel.G3DJ_HANDLE, textBox.getText());
+                    FbxConv.renameAnimation(fbxConvModel.G3DJ_HANDLE, animationField.getText());
                     try {
                         FbxConv.G3DB_CONVERTER.convert(FbxConvGui.model.G3DJ_HANDLE, true);
                         FbxConvGui.model.reload();
@@ -79,9 +81,10 @@ public class FbxConvUI extends Stage {
                         throw new RuntimeException(e);
                     }
                 }
+                super.unfocus(animationField);
             }
         });
-        addActor(textBox);
+        addActor(animationField);
 
         // Loads the 'Label' font
         Font.FontBuilder fontBuilder = new Font.FontBuilder();
@@ -119,6 +122,7 @@ public class FbxConvUI extends Stage {
      */
     public void updateViewport(int width, int height) {
         getViewport().update(width, height, true);
+        shortcutsWindowButton.setBounds(0, height - 32f, 64f, 32f);
     }
 
     /**
@@ -126,6 +130,10 @@ public class FbxConvUI extends Stage {
      */
     public void toggleVisibility() {
         if (FbxConvGui.fileExplorer != null && !FbxConvGui.fileExplorer.isVisible()) isVisible = !isVisible;
+    }
+
+    public boolean isFocused() {
+        return getKeyboardFocus() != null;
     }
 
     /**

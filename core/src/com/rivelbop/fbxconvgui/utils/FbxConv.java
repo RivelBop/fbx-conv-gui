@@ -132,23 +132,27 @@ public final class FbxConv {
     /**
      * Combines 2 G3DJ files into one with the specified path name.
      *
-     * @param v1   G3DJ file to combine into.
-     * @param v2   G3DJ file to combine from.
-     * @param name G3DJ output file path.
+     * @param g3dj_1   G3DJ file to combine into.
+     * @param g3dj_2   G3DJ file to combine from.
      */
-    public static void combineG3DJ(JsonValue v1, JsonValue v2, FileHandle name) {
-        // Put the animation from model2 into model1
+    public static void combineG3DJ(FileHandle g3dj_1, FileHandle g3dj_2) {
+        // Parse the g3dj data
+        JsonReader reader = new JsonReader();
+        JsonValue v1 = reader.parse(g3dj_1);
+        JsonValue v2 = reader.parse(g3dj_2);
+
+        // Put the animation from g3dj_2 into g3dj_1
         v1.get("animations").addChild(v2.get("animations").child);
 
         // Write the new data for model1 back into its G3DJ file
         try {
-            FileWriter writer = new FileWriter(name.path());
+            FileWriter writer = new FileWriter(g3dj_1.pathWithoutExtension() + "_" + g3dj_2.nameWithoutExtension() + ".g3dj");
             writer.write(v1.prettyPrint(new JsonValue.PrettyPrintSettings() {{
                 outputType = JsonWriter.OutputType.json;
                 wrapNumericArrays = true;
             }}));
             writer.close();
-            System.out.println(v1.name() + " added to " + v2.name());
+            System.out.println(g3dj_1.name() + " added to " + g3dj_2.name());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
