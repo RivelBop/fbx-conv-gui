@@ -1,6 +1,8 @@
 package com.rivelbop.fbxconvgui.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.rivelbop.fbxconvgui.FbxConvGui;
+import com.rivelbop.fbxconvgui.utils.FbxConv;
 import com.rivelbop.fbxconvgui.utils.FbxConvModel;
 
 import javax.swing.*;
@@ -56,6 +58,7 @@ public class FileExplorerWindow extends JFrame {
                 Gdx.app.postRunnable(() -> {
                     if (tempModel != null) tempModel.dispose();
                     model.reload();
+                    FbxConvGui.convUI.animationList.setItems(FbxConv.parseAnimations(model.G3DJ_HANDLE));
                 });
 
                 explorer.setSelectedFile(model.FBX);

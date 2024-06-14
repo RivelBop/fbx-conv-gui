@@ -21,7 +21,6 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.rivelbop.fbxconvgui.ui.FbxConvUI;
 import com.rivelbop.fbxconvgui.ui.FileExplorerWindow;
 import com.rivelbop.fbxconvgui.ui.ShortCutsWindow;
-import com.rivelbop.fbxconvgui.utils.FbxConv;
 import com.rivelbop.fbxconvgui.utils.FbxConvModel;
 
 import javax.swing.*;
@@ -38,7 +37,7 @@ public class FbxConvGui extends ApplicationAdapter {
     // UI
     public static FileExplorerWindow fileExplorer;
     public static ShortCutsWindow shortCutsWindow;
-    private FbxConvUI convUI;
+    public static FbxConvUI convUI;
 
     // Input Processes
     private InputMultiplexer inputMultiplexer;
@@ -90,8 +89,6 @@ public class FbxConvGui extends ApplicationAdapter {
         inputMultiplexer = new InputMultiplexer();
         inputMultiplexer.addProcessor(convUI);
         Gdx.input.setInputProcessor(inputMultiplexer);
-        
-        FbxConv.combineG3DJ(Gdx.files.absolute("/home/djerzak/Downloads/innershaft/Idle.fbm/Idle.g3dj"), Gdx.files.absolute("/home/djerzak/Downloads/innershaft/Walking.fbm/Walking.g3dj"));
     }
 
     /**
@@ -102,7 +99,11 @@ public class FbxConvGui extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         // If pressed ESC, all UI elements are unfocused
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) convUI.unfocusAll();
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            convUI.unfocusAll();
+            fileExplorer.setVisible(false);
+            shortCutsWindow.setVisible(false);
+        }
 
         // Toggle UI visibility
         if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) {

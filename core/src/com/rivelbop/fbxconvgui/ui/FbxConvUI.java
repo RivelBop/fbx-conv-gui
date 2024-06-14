@@ -2,11 +2,9 @@ package com.rivelbop.fbxconvgui.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.rivelbop.fbxconvgui.FbxConvGui;
 import com.rivelbop.fbxconvgui.utils.FbxConv;
@@ -27,6 +25,8 @@ public class FbxConvUI extends Stage {
 
     // GUI Components
     private TextButton shortcutsWindowButton;
+    private ScrollPane scrollPane;
+    public List<String> animationList;
 
     /**
      * Creates a libGDX UI Stage, using the provided viewport. Contains all the in-app interface.
@@ -86,6 +86,11 @@ public class FbxConvUI extends Stage {
         });
         addActor(animationField);
 
+        // Lists all the animations of the model
+        animationList = new List<>(SKIN);
+        scrollPane = new ScrollPane(animationList);
+        addActor(scrollPane);
+
         // Loads the 'Label' font
         Font.FontBuilder fontBuilder = new Font.FontBuilder();
         this.LABEL_FONT = fontBuilder
@@ -123,6 +128,7 @@ public class FbxConvUI extends Stage {
     public void updateViewport(int width, int height) {
         getViewport().update(width, height, true);
         shortcutsWindowButton.setBounds(0, height - 32f, 64f, 32f);
+        scrollPane.setBounds(width - 144f, height - 160f, 144f, 160f);
     }
 
     /**

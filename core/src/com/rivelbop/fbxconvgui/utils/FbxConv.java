@@ -2,6 +2,7 @@ package com.rivelbop.fbxconvgui.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
@@ -182,5 +183,18 @@ public final class FbxConv {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    /**
+     * Parses the provided g3dj file and returns a list of all the animation names.
+     *
+     * @param g3dj The g3dj file to parse/read from.
+     * @return List of animation names.
+     */
+    public static Array<String> parseAnimations(FileHandle g3dj) {
+        JsonValue g3djValue = new JsonReader().parse(g3dj).get("animations");
+        Array<String> animationNames = new Array<>(g3djValue.size);
+        g3djValue.iterator().forEach(animation -> animationNames.add(animation.get("id").asString()));
+        return animationNames;
     }
 }
