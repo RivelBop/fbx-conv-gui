@@ -70,6 +70,7 @@ public final class FbxConv {
      * Converts the FBX model at the provided path into both a G3DJ and G3DB model.
      *
      * @param fbxFile The FBX file to convert.
+     * @return The FBX file used (location may be altered).
      */
     public static File convertModel(File fbxFile) {
         // Generate G3DJ from FBX
@@ -135,8 +136,9 @@ public final class FbxConv {
      *
      * @param g3dj_1   G3DJ file to combine into.
      * @param g3dj_2   G3DJ file to combine from.
+     * @return The newly combined G3DJ file.
      */
-    public static void combineG3DJ(FileHandle g3dj_1, FileHandle g3dj_2) {
+    public static File combineG3DJ(FileHandle g3dj_1, FileHandle g3dj_2) {
         // Parse the g3dj data
         JsonReader reader = new JsonReader();
         JsonValue v1 = reader.parse(g3dj_1);
@@ -147,13 +149,15 @@ public final class FbxConv {
 
         // Write the new data for model1 back into its G3DJ file
         try {
-            FileWriter writer = new FileWriter(g3dj_1.pathWithoutExtension() + "_" + g3dj_2.nameWithoutExtension() + ".g3dj");
+            File combinedG3djFile = new File(g3dj_1.pathWithoutExtension() + "_" + g3dj_2.nameWithoutExtension() + ".g3dj");
+            FileWriter writer = new FileWriter(combinedG3djFile);
             writer.write(v1.prettyPrint(new JsonValue.PrettyPrintSettings() {{
                 outputType = JsonWriter.OutputType.json;
                 wrapNumericArrays = true;
             }}));
             writer.close();
             System.out.println(g3dj_1.name() + " added to " + g3dj_2.name());
+            return combinedG3djFile;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

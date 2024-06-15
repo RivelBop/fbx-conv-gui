@@ -51,17 +51,8 @@ public class FileExplorerWindow extends JFrame {
         // If FBX file is selected, convert the model, and display it to the user
         explorer.addActionListener(e -> {
             if (e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION)) {
-                setVisible(false);
-
-                FbxConvModel tempModel = model;
-                model = new FbxConvModel(explorer.getSelectedFile());
-                Gdx.app.postRunnable(() -> {
-                    if (tempModel != null) tempModel.dispose();
-                    model.reload();
-                    FbxConvGui.convUI.animationList.setItems(FbxConv.parseAnimations(model.G3DJ_HANDLE));
-                });
-
-                explorer.setSelectedFile(model.FBX);
+                if (model == null) loadSelectedModelToScene();
+                else FbxConvGui.combinationWindow.setVisible(true);
             } else if (e.getActionCommand().equals(JFileChooser.CANCEL_SELECTION)) setVisible(false);
         });
     }
@@ -84,5 +75,22 @@ public class FileExplorerWindow extends JFrame {
         setLocationRelativeTo(null);
         setAlwaysOnTop(true);
         setVisible(false);
+    }
+
+    /**
+     * Loads the selected model to the 3D world to be displayed.
+     */
+    public void loadSelectedModelToScene() {
+        setVisible(false);
+
+        FbxConvModel tempModel = model;
+        model = new FbxConvModel(explorer.getSelectedFile());
+        Gdx.app.postRunnable(() -> {
+            if (tempModel != null) tempModel.dispose();
+            model.reload();
+            FbxConvGui.convUI.animationList.setItems(FbxConv.parseAnimations(model.G3DJ_HANDLE));
+        });
+
+        explorer.setSelectedFile(model.FBX);
     }
 }

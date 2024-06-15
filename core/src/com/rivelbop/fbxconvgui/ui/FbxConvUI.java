@@ -13,6 +13,8 @@ import com.rivelbop.fbxconvgui.utils.Font;
 
 import java.io.IOException;
 
+import static com.rivelbop.fbxconvgui.FbxConvGui.model;
+
 /**
  * Handles all in-app UI (part of the GLFW window).
  *
@@ -77,6 +79,7 @@ public class FbxConvUI extends Stage {
                     try {
                         FbxConv.G3DB_CONVERTER.convert(FbxConvGui.model.G3DJ_HANDLE, true);
                         FbxConvGui.model.reload();
+                        FbxConvGui.convUI.animationList.setItems(FbxConv.parseAnimations(model.G3DJ_HANDLE));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
