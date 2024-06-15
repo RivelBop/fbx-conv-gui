@@ -18,6 +18,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.UBJsonReader;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.rivelbop.fbxconvgui.ui.CombinationWindow;
 import com.rivelbop.fbxconvgui.ui.FbxConvUI;
 import com.rivelbop.fbxconvgui.ui.FileExplorerWindow;
 import com.rivelbop.fbxconvgui.ui.ShortCutsWindow;
@@ -37,6 +38,7 @@ public class FbxConvGui extends ApplicationAdapter {
     // UI
     public static FileExplorerWindow fileExplorer;
     public static ShortCutsWindow shortCutsWindow;
+    public static CombinationWindow combinationWindow;
     public static FbxConvUI convUI;
 
     // Input Processes
@@ -63,6 +65,7 @@ public class FbxConvGui extends ApplicationAdapter {
         SwingUtilities.invokeLater(() -> {
             fileExplorer = new FileExplorerWindow();
             shortCutsWindow = new ShortCutsWindow();
+            combinationWindow = new CombinationWindow();
         });
     }
 
