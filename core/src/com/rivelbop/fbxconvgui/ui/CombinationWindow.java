@@ -1,10 +1,17 @@
 package com.rivelbop.fbxconvgui.ui;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.rivelbop.fbxconvgui.FbxConvGui;
 import com.rivelbop.fbxconvgui.utils.FbxConv;
+import com.rivelbop.fbxconvgui.utils.FbxConvModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+
+import static com.rivelbop.fbxconvgui.FbxConvGui.model;
 
 /**
  * Pop up window asking user if they want to combine the animations of two separate models.
@@ -45,8 +52,23 @@ public class CombinationWindow extends JFrame {
         JButton combineButton = new JButton("Combine");
         combineButton.addActionListener(e -> {
             super.setVisible(false);
-            // TODO: Combine the files and set model to that
-            //FbxConv.combineG3DJ();
+            FbxConvModel selectedModel = new FbxConvModel(FbxConvGui.fileExplorer.explorer.getSelectedFile());
+
+            File g3dj = FbxConv.combineG3DJ(model.g3djHandle, selectedModel.g3djHandle);
+            model.g3dj = g3dj;
+            model.g3djHandle = new FileHandle(g3dj);
+
+            try {
+                FbxConv.G3DB_CONVERTER.convert(model.g3djHandle, true);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+
+            File g3db = new File(g3dj.getAbsolutePath().replace(".g3dj", ".g3db"));
+            model.g3db = g3db;
+            model.g3dbHandle = new FileHandle(g3db);
+            Gdx.app.postRunnable(() -> model.reload());
+            FbxConvGui.convUI.animationList.setItems(FbxConv.parseAnimations(model.g3djHandle));
         });
         add(combineButton, constraint);
 

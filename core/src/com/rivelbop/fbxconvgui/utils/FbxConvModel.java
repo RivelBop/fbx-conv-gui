@@ -22,8 +22,8 @@ import java.io.File;
  */
 public class FbxConvModel implements Disposable {
     // IO
-    public final File FBX, G3DJ, G3DB, DIR;
-    public final FileHandle FBX_HANDLE, G3DJ_HANDLE, G3DB_HANDLE;
+    public File fbx, g3dj, g3db, dir;
+    public FileHandle fileHandle, g3djHandle, g3dbHandle;
 
     // Model properties
     public Model model;
@@ -38,22 +38,22 @@ public class FbxConvModel implements Disposable {
     public FbxConvModel(File selectedFbxFile) {
         // Convert the FBX file
         File tempFBX = FbxConv.convertModel(selectedFbxFile);
-        DIR = tempFBX.getParentFile();
+        dir = tempFBX.getParentFile();
 
         // Get the converted files
         String fbxFilePath = tempFBX.getAbsolutePath();
-        G3DJ = new File(fbxFilePath.replace(".fbx", ".g3dj"));
-        G3DJ_HANDLE = new FileHandle(G3DJ);
-        G3DB = new File(fbxFilePath.replace(".fbx", ".g3db"));
-        G3DB_HANDLE = new FileHandle(G3DB);
+        g3dj = new File(fbxFilePath.replace(".fbx", ".g3dj"));
+        g3djHandle = new FileHandle(g3dj);
+        g3db = new File(fbxFilePath.replace(".fbx", ".g3db"));
+        g3dbHandle = new FileHandle(g3db);
 
         // Move FBX back (if necessary)
-        if (DIR.getName().endsWith(".fbm")) {
-            FBX = new File(DIR.getParent() + "/" + tempFBX.getName());
-            if (tempFBX.renameTo(FBX))
-                System.out.println(FBX.getName() + " -> " + FBX.getParent() + "/");
-        } else FBX = tempFBX;
-        FBX_HANDLE = new FileHandle(FBX);
+        if (dir.getName().endsWith(".fbm")) {
+            fbx = new File(dir.getParent() + "/" + tempFBX.getName());
+            if (tempFBX.renameTo(fbx))
+                System.out.println(fbx.getName() + " -> " + fbx.getParent() + "/");
+        } else fbx = tempFBX;
+        fileHandle = new FileHandle(fbx);
     }
 
     /**
@@ -81,13 +81,13 @@ public class FbxConvModel implements Disposable {
     public void reload() {
         // Create the model
         model = new G3dModelLoader(new UBJsonReader())
-                .loadModel(G3DB_HANDLE);
+                .loadModel(g3dbHandle);
         instance = new ModelInstance(model);
 
         // Create animation controller
         animationController = new AnimationController(instance);
         JsonValue animation = new JsonReader()
-                .parse(G3DJ_HANDLE)
+                .parse(g3djHandle)
                 .get("animations");
         if (animation.child != null)
             animationController.setAnimation(animation.child.get("id").asString(), -1);

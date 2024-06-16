@@ -55,10 +55,10 @@ public final class FbxConv {
                                 "echo $LD_LIBRARY_PATH\n"
                 );
                 fileWriter.close();
-                System.out.println("Linux library installation script has been created!");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            System.out.println("Linux library installation script has been created!");
         } else OS = OS_TYPE.NULL;
         System.out.println("Detected OS: " + OS);
     }
@@ -103,10 +103,10 @@ public final class FbxConv {
         if (!directory.isDirectory()) {
             try {
                 G3DB_CONVERTER.convert(Gdx.files.absolute(g3djFile.getAbsolutePath()), true);
-                System.out.println("Converted FBX Model: " + fileName);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            System.out.println("Converted FBX Model: " + fileName);
             return fbxFile;
         }
 
@@ -124,18 +124,18 @@ public final class FbxConv {
         // Generate G3DB file
         try {
             G3DB_CONVERTER.convert(Gdx.files.absolute(newG3djFile.getAbsolutePath()), true);
-            System.out.println("Converted FBX Model: " + fileName);
-            return newFbxFile;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        System.out.println("Converted FBX Model: " + fileName);
+        return newFbxFile;
     }
 
     /**
      * Combines 2 G3DJ files into one with the specified path name.
      *
-     * @param g3dj_1   G3DJ file to combine into.
-     * @param g3dj_2   G3DJ file to combine from.
+     * @param g3dj_1 G3DJ file to combine into.
+     * @param g3dj_2 G3DJ file to combine from.
      * @return The newly combined G3DJ file.
      */
     public static File combineG3DJ(FileHandle g3dj_1, FileHandle g3dj_2) {
@@ -148,43 +148,50 @@ public final class FbxConv {
         v1.get("animations").addChild(v2.get("animations").child);
 
         // Write the new data for model1 back into its G3DJ file
+        File combinedG3djFile = new File(g3dj_1.pathWithoutExtension() + "_" + g3dj_2.nameWithoutExtension() + ".g3dj");
         try {
-            File combinedG3djFile = new File(g3dj_1.pathWithoutExtension() + "_" + g3dj_2.nameWithoutExtension() + ".g3dj");
             FileWriter writer = new FileWriter(combinedG3djFile);
             writer.write(v1.prettyPrint(new JsonValue.PrettyPrintSettings() {{
                 outputType = JsonWriter.OutputType.json;
                 wrapNumericArrays = true;
             }}));
             writer.close();
-            System.out.println(g3dj_1.name() + " added to " + g3dj_2.name());
-            return combinedG3djFile;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        System.out.println(g3dj_1.name() + " added to " + g3dj_2.name());
+        return combinedG3djFile;
     }
 
     /**
-     * Renames the animation of the provided G3DJ file path.
+     * Renames the animation of a g3dj file.
      *
-     * @param name  The file path to the G3DJ file.
-     * @param value The name to set the animation to.
+     * @param g3dj          The file from which the animation should be renamed.
+     * @param animationName The animation to rename.
+     * @param newName       The new name of the animation.
      */
-    public static void renameAnimation(FileHandle name, String value) {
-        JsonValue g3dj = new JsonReader().parse(name);
-        JsonValue animation = g3dj.get("animations").child;
+    public static void renameAnimation(FileHandle g3dj, String animationName, String newName) {
+        JsonValue g3djValue = new JsonReader().parse(g3dj);
+        JsonValue animationValue = g3djValue.get("animations");
 
-        if (animation != null) {
-            animation.get("id").set(value);
-            try {
-                FileWriter writer = new FileWriter(name.path());
-                writer.write(g3dj.prettyPrint(new JsonValue.PrettyPrintSettings() {{
-                    outputType = JsonWriter.OutputType.json;
-                    wrapNumericArrays = true;
-                }}));
-                writer.close();
-                System.out.println("Successfully renamed G3DJ animation to: " + value);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        for (JsonValue jsonValue : animationValue) {
+            JsonValue value = jsonValue.get("id");
+            if (value.asString().equals(animationName)) {
+                value.set(newName);
+
+                try {
+                    FileWriter writer = new FileWriter(g3dj.path());
+                    writer.write(g3djValue.prettyPrint(new JsonValue.PrettyPrintSettings() {{
+                        outputType = JsonWriter.OutputType.json;
+                        wrapNumericArrays = true;
+                    }}));
+                    writer.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                System.out.println("Successfully renamed G3DJ animation to: " + newName);
+                return;
             }
         }
     }
@@ -198,7 +205,10 @@ public final class FbxConv {
     public static Array<String> parseAnimations(FileHandle g3dj) {
         JsonValue g3djValue = new JsonReader().parse(g3dj).get("animations");
         Array<String> animationNames = new Array<>(g3djValue.size);
-        g3djValue.iterator().forEach(animation -> animationNames.add(animation.get("id").asString()));
+
+        for (JsonValue animation : g3djValue)
+            animationNames.add(animation.get("id").asString());
+
         return animationNames;
     }
 }

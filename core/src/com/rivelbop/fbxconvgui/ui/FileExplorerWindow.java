@@ -52,7 +52,10 @@ public class FileExplorerWindow extends JFrame {
         explorer.addActionListener(e -> {
             if (e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION)) {
                 if (model == null) loadSelectedModelToScene();
-                else FbxConvGui.combinationWindow.setVisible(true);
+                else {
+                    setVisible(false);
+                    FbxConvGui.combinationWindow.setVisible(true);
+                }
             } else if (e.getActionCommand().equals(JFileChooser.CANCEL_SELECTION)) setVisible(false);
         });
     }
@@ -88,9 +91,9 @@ public class FileExplorerWindow extends JFrame {
         Gdx.app.postRunnable(() -> {
             if (tempModel != null) tempModel.dispose();
             model.reload();
-            FbxConvGui.convUI.animationList.setItems(FbxConv.parseAnimations(model.G3DJ_HANDLE));
+            FbxConvGui.convUI.animationList.setItems(FbxConv.parseAnimations(model.g3djHandle));
         });
 
-        explorer.setSelectedFile(model.FBX);
+        explorer.setSelectedFile(model.fbx);
     }
 }

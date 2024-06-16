@@ -2,7 +2,6 @@ package com.rivelbop.fbxconvgui.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -26,8 +25,8 @@ public class FbxConvUI extends Stage {
     public boolean isVisible;
 
     // GUI Components
-    private TextButton shortcutsWindowButton;
-    private ScrollPane scrollPane;
+    private final TextButton shortcutsWindowButton;
+    private final ScrollPane scrollPane;
     public List<String> animationList;
 
     /**
@@ -58,7 +57,7 @@ public class FbxConvUI extends Stage {
         addActor(shortcutsWindowButton);
 
         // Sets the camera's FOV
-        Slider fovSlider = new Slider(30f, 120f, 2f, false, SKIN);
+        Slider fovSlider = new Slider(1f, 120f, 2f, false, SKIN);
         fovSlider.setBounds(220f, 15f, 128f, 48f);
         fovSlider.setValue(70f);
         FbxConvGui.camera.fieldOfView = fovSlider.getValue();
@@ -75,15 +74,16 @@ public class FbxConvUI extends Stage {
             if (c == '\n') {
                 FbxConvModel fbxConvModel = FbxConvGui.model;
                 if (fbxConvModel != null) {
-                    FbxConv.renameAnimation(fbxConvModel.G3DJ_HANDLE, animationField.getText());
+                    FbxConv.renameAnimation(fbxConvModel.g3djHandle, FbxConvGui.convUI.animationList.getSelected(), animationField.getText());
                     try {
-                        FbxConv.G3DB_CONVERTER.convert(FbxConvGui.model.G3DJ_HANDLE, true);
-                        FbxConvGui.model.reload();
-                        FbxConvGui.convUI.animationList.setItems(FbxConv.parseAnimations(model.G3DJ_HANDLE));
+                        FbxConv.G3DB_CONVERTER.convert(FbxConvGui.model.g3djHandle, true);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
+                    FbxConvGui.model.reload();
+                    FbxConvGui.convUI.animationList.setItems(FbxConv.parseAnimations(model.g3djHandle));
                 }
+                animationField.setText("");
                 super.unfocus(animationField);
             }
         });
@@ -91,6 +91,14 @@ public class FbxConvUI extends Stage {
 
         // Lists all the animations of the model
         animationList = new List<>(SKIN);
+        animationList.addListener(e -> {
+            if (e.isHandled() && animationList.getSelected() != null) {
+                model.animationController.setAnimation(animationList.getSelected(), -1);
+                super.unfocus(animationList);
+                return true;
+            }
+            return false;
+        });
         scrollPane = new ScrollPane(animationList);
         addActor(scrollPane);
 
@@ -117,7 +125,7 @@ public class FbxConvUI extends Stage {
             SpriteBatch batch = (SpriteBatch) getBatch();
             batch.begin();
             LABEL_FONT.draw(batch, "Animation name: ", 20, 90);
-            LABEL_FONT.draw(batch, "Fov: ", 170, 48);
+            LABEL_FONT.draw(batch, "FOV: ", 170, 48);
             batch.end();
         }
     }
@@ -141,6 +149,9 @@ public class FbxConvUI extends Stage {
         if (FbxConvGui.fileExplorer != null && !FbxConvGui.fileExplorer.isVisible()) isVisible = !isVisible;
     }
 
+    /**
+     * @return Whether the keyboard is focused on the Scene.
+     */
     public boolean isFocused() {
         return getKeyboardFocus() != null;
     }

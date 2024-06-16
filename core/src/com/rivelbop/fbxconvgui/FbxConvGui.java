@@ -144,7 +144,7 @@ public class FbxConvGui extends ApplicationAdapter {
         }
 
         // If the UI is in focus, don't allow the user to control the camera
-        if(convUI.isFocused()) {
+        if (convUI.isFocused()) {
             inputMultiplexer.removeProcessor(cameraController);
             oldFlyCam = false;
         }
