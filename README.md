@@ -1,5 +1,5 @@
 # fbx-conv-gui
- Cross-platform GUI for [fbx-conv](https://github.com/libgdx/fbx-conv "fbx-conv Github").
+ Windows GUI for [fbx-conv](https://github.com/libgdx/fbx-conv "fbx-conv Github").
  
  ## Open Source
  fbx-conv-gui is entirely open-source and completely free to use and alter.
